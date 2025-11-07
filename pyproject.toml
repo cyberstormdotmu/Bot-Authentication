@@ -1,6 +1,6 @@
 [project]
 name = "bot-auth"
-version = "0.2.2"
+version = "0.3.2"
 description = "A library to check for AI Bot Authentication using the latest HTTP header Signature."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -15,6 +15,10 @@ dependencies = [
     "http-message-signatures>=0.7.0",
     "requests>=2.25.0",
 ]
+[project.urls]
+homepage = "https://github.com/cyberstormdotmu/Bot-Authentication"
+source = "https://github.com/cyberstormdotmu/Bot-Authentication.git"
+issues = "https://github.com/cyberstormdotmu/Bot-Authentication/issues"
 
 [build-system]
 requires = ["uv_build>=0.8.0,<0.9"]

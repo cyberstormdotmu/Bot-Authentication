@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.12'",
@@ -8,9 +8,9 @@ resolution-markers = [
 
 [manifest]
 members = [
+    "bot-auth",
     "crawl4ai-hook",
     "scrapy-spider",
-    "web-bot-auth",
 ]
 
 [[package]]
@@ -223,6 +223,35 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/e3/ee/adda3d46d4a9120772fae6de454c8495603c37c4c3b9c60f25b1ab6401fe/black-25.1.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:030b9759066a4ee5e5aca28c3c77f9c64789cdd4de8ac1df642c40b708be6171", size = 1782926, upload-time = "2025-01-29T04:18:58.564Z" },
     { url = "https://files.pythonhosted.org/packages/cc/64/94eb5f45dcb997d2082f097a3944cfc7fe87e071907f677e80788a2d7b7a/black-25.1.0-cp313-cp313-win_amd64.whl", hash = "sha256:a22f402b410566e2d1c950708c77ebf5ebd5d0d88a6a2e87c86d9fb48afa0d18", size = 1442613, upload-time = "2025-01-29T04:19:27.63Z" },
     { url = "https://files.pythonhosted.org/packages/09/71/54e999902aed72baf26bca0d50781b01838251a462612966e9fc4891eadd/black-25.1.0-py3-none-any.whl", hash = "sha256:95e8176dae143ba9097f351d174fdaf0ccd29efb414b362ae3fd72bf0f710717", size = 207646, upload-time = "2025-01-29T04:15:38.082Z" },
+]
+
+[[package]]
+name = "bot-auth"
+version = "0.3.1"
+source = { editable = "." }
+dependencies = [
+    { name = "cryptography" },
+    { name = "http-message-signatures" },
+    { name = "requests" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "black" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "cryptography", specifier = ">=45.0.0" },
+    { name = "http-message-signatures", specifier = ">=0.7.0" },
+    { name = "requests", specifier = ">=2.25.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "black", specifier = ">=25.1.0" },
+    { name = "ruff", specifier = ">=0.12.4" },
 ]
 
 [[package]]
@@ -2774,35 +2803,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/bf/7d/1172cfaa1e29beb9bf938e484c122b3bdc82e8e37b17a4f753ba6d6e009f/w3lib-2.3.1.tar.gz", hash = "sha256:5c8ac02a3027576174c2b61eb9a2170ba1b197cae767080771b6f1febda249a4", size = 49531, upload-time = "2025-01-27T14:22:10.453Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/58/dd/56f0d8af71e475ed194d702f8b4cf9cea812c95e82ad823d239023c6558c/w3lib-2.3.1-py3-none-any.whl", hash = "sha256:9ccd2ae10c8c41c7279cd8ad4fe65f834be894fe7bfdd7304b991fd69325847b", size = 21751, upload-time = "2025-01-27T14:22:09.421Z" },
-]
-
-[[package]]
-name = "web-bot-auth"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "cryptography" },
-    { name = "http-message-signatures" },
-    { name = "requests" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "black" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "cryptography", specifier = ">=45.0.0" },
-    { name = "http-message-signatures", specifier = ">=0.7.0" },
-    { name = "requests", specifier = ">=2.25.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "black", specifier = ">=25.1.0" },
-    { name = "ruff", specifier = ">=0.12.4" },
 ]
 
 [[package]]

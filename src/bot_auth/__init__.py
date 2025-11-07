@@ -4,9 +4,11 @@ Web Bot Auth Library
 A library to check for AI Bot Authentication using the latest HTTP header Signature.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.3.1"
 
 import base64
+import hashlib
+import json
 import requests
 import time
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -49,15 +51,12 @@ class BotAuth:
     - get_local_keys() -> -> list[dict[str, str]]
     - get_remote_keys() -> list[dict[str, str]]
     - get_header()-> dict[str, str]
-
-    @info:
-    © 2025 Atish Joottun
     """
 
     def __init__(
         self,
         localKeys,
-        signAgent="http-message-signatures-example.research.cloudflare.com",
+        signAgent=None,
     ):
         self.localKeys = localKeys
         self.signAgent = signAgent
@@ -115,8 +114,29 @@ class BotAuth:
     def _base64_encode_bytes(self, val):
         return base64.b64encode(val).decode("ascii")
 
+    def _base64url_nopad_encode_bytes(self, val):
+        return base64.urlsafe_b64encode(val).decode("ascii").strip("=")
+
     def _jwt_to_private_key(self, jwk):
         return Ed25519PrivateKey.from_private_bytes(self._base64url_decode(jwk["d"]))
+
+    def _public_key_to_jwk_thumbprint(self, public_key):
+        """
+        Compute the base64url JWK SHA-256 Thumbprint for an Ed25519 public key.
+        """
+        # JWK Thumbprint according to RFC 7638, base64url with padding and sha256
+
+        jwk_dict = {
+            "crv": "Ed25519",
+            "kty": "OKP",
+            "x": self._base64url_nopad_encode_bytes(public_key.public_bytes_raw()),
+        }
+
+        jwk_json = json.dumps(jwk_dict, separators=(",", ":"), sort_keys=True)
+        sha256_hash = hashlib.sha256(jwk_json.encode("utf-8")).digest()
+        thumbprint = self._base64url_nopad_encode_bytes(sha256_hash)
+
+        return thumbprint
 
     # def _jwk_to_public_key_bytes(self, jwk):
     #     private_key = self.jwk_to_private_key(jwk)
@@ -133,7 +153,8 @@ class BotAuth:
         ## Get similar key in local repo
         selected_key = local_keys[0]
 
-        resolver = SingleKeyResolver(self._jwt_to_private_key(selected_key))
+        private_key = self._jwt_to_private_key(selected_key)
+        resolver = SingleKeyResolver(private_key)
         signer = HTTPMessageSigner(
             signature_algorithm=algorithms.ED25519, key_resolver=resolver
         )
@@ -141,26 +162,33 @@ class BotAuth:
         created = datetime.fromtimestamp(time.time())
         expires = created + timedelta(minutes=5)
 
+        headers = {"Signature-Agent": self.signAgent} if self.signAgent else {}
         request = requests.Request(
             "GET",
             url,
             headers={
-                "Signature-Agent": self.signAgent,
+                **headers,
             },
+        )
+
+        key_id = self._public_key_to_jwk_thumbprint(private_key.public_key())
+        covered_components = (
+            ("@authority", "signature-agent") if self.signAgent else ["@authority"]
         )
         signer.sign(
             request,
-            key_id="compute-jwk-thumbprint",
-            covered_component_ids=("@authority", "signature-agent"),
+            key_id=key_id,
+            covered_component_ids=covered_components,
             created=created,
             expires=expires,
             tag="web-bot-auth",
+            label="sig1",
         )
 
         header = {
-            "Signature-Agent": request.headers["Signature-Agent"],
             "Signature-Input": request.headers["Signature-Input"],
             "Signature": request.headers["Signature"],
+            **headers,
         }
 
         return header
